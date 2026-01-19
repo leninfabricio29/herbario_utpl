@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Espécimen - Herbario UTPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2d5a27',
+                        'primary-dark': '#1e3d1a',
+                        secondary: '#4a7c43',
+                        'light-green': '#e8f5e9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed top-0 left-0 w-64 h-screen bg-gradient-to-b from-primary to-secondary text-white z-50">
+            <div class="p-6 border-b border-white/10">
+                <h4 class="text-xl font-bold flex items-center gap-2">
+                    <i class="bi bi-flower1"></i> Herbario UTPL
+                </h4>
+                <p class="text-green-200 text-sm mt-1">Panel Administrativo</p>
+            </div>
+            <nav class="mt-4">
+                <ul class="space-y-1">
+                    <li><a href="/dashboard" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                    <li><a href="/plants" class="flex items-center gap-3 px-6 py-3 bg-white/15 text-white"><i class="bi bi-tree"></i> Especímenes</a></li>
+                    <li><a href="/dashboard/profile" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                </ul>
+                <div class="absolute bottom-0 left-0 right-0 border-t border-white/10">
+                    <a href="/logout" class="flex items-center gap-3 px-6 py-4 text-white/80 hover:bg-white/15"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="ml-64 flex-1 p-8">
+            <!-- Filtros -->
+<div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+    <form action="/plants" method="GET" class="flex flex-wrap gap-4">
+        <div class="flex-1 min-w-[200px]">
+            <input 
+                type="text" 
+                name="search" 
+                value="<%= filters.search || '' %>"
+                placeholder="Buscar por nombre científico o catálogo..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none"
+            >
+        </div>
+        <div class="w-40">
+            <input 
+                type="text" 
+                name="family" 
+                value="<%= filters.family || '' %>"
+                placeholder="Familia"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none"
+            >
+        </div>
+        <div class="w-40">
+            <input 
+                type="text" 
+                name="country" 
+                value="<%= filters.country || '' %>"
+                placeholder="País"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none"
+            >
+        </div>
+        <button type="submit" class="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-lg transition-all">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+        <a href="/plants" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-gray-600">
+            Limpiar
+        </a>
+    </form>
+</div>
+
+<!-- Tabla -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <% if (plants && plants.length > 0) { %>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr class="text-left text-gray-600 text-sm">
+                    <th class="px-6 py-4 font-medium">Catálogo</th>
+                    <th class="px-6 py-4 font-medium">Nombre Científico</th>
+                    <th class="px-6 py-4 font-medium">Familia</th>
+                    <th class="px-6 py-4 font-medium">Ubicación</th>
+                    <th class="px-6 py-4 font-medium">Recolector</th>
+                    <th class="px-6 py-4 font-medium text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <% plants.forEach(plant => { %>
+                <tr class="hover:bg-gray-50 transition-all">
+                    <td class="px-6 py-4">
+                        <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                            <%= plant.catalogNumber %>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-gray-800 italic">
+                            <%= plant.taxonomy?.scientificName || '-' %>
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            <%= plant.taxonomy?.scientificNameAuthorship || '' %>
+                        </p>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600"><%= plant.taxonomy?.family || '-' %></td>
+                    <td class="px-6 py-4">
+                        <p class="text-gray-800"><%= plant.country || '-' %></p>
+                        <p class="text-xs text-gray-500"><%= plant.stateProvince || '' %></p>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600 text-sm"><%= plant.recordedBy || '-' %></td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="/plants/<%= plant._id %>" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/plants/<%= plant._id %>/edit" class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-all" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="/plants/<%= plant._id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar este espécimen?')">
+                                <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <% if (pagination.totalPages > 1) { %>
+    <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+        <p class="text-sm text-gray-500">
+            Mostrando página <%= pagination.page %> de <%= pagination.totalPages %> 
+            (<%= pagination.total %> registros)
+        </p>
+        <div class="flex gap-2">
+            <% if (pagination.page > 1) { %>
+            <a href="/plants?page=<%= pagination.page - 1 %>&search=<%= filters.search || '' %>" 
+               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-sm">
+                <i class="bi bi-chevron-left"></i> Anterior
+            </a>
+            <% } %>
+            <% if (pagination.page < pagination.totalPages) { %>
+            <a href="/plants?page=<%= pagination.page + 1 %>&search=<%= filters.search || '' %>" 
+               class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-all text-sm">
+                Siguiente <i class="bi bi-chevron-right"></i>
+            </a>
+            <% } %>
+        </div>
+    </div>
+    <% } %>
+
+    <% } else { %>
+    <div class="text-center py-16">
+        <i class="bi bi-inbox text-6xl text-gray-300"></i>
+        <p class="text-gray-500 mt-4">No se encontraron especímenes</p>
+        <a href="/plants/new" class="inline-flex items-center gap-2 mt-4 text-primary hover:text-secondary">
+            <i class="bi bi-plus-circle"></i> Agregar el primero
+        </a>
+    </div>
+    <% } %>
+</div>
+
+
+        </main>
+

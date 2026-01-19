@@ -1,0 +1,81 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Herbario UTPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2d5a27',
+                        'primary-dark': '#1e3d1a',
+                        secondary: '#4a7c43',
+                        'light-green': '#e8f5e9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<div class="bg-white rounded-xl shadow-sm">
+    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+            <i class="bi bi-people text-primary"></i>
+            Usuarios del Sistema
+        </h3>
+    </div>
+    <div class="p-6">
+        <% if (users && users.length > 0) { %>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left text-gray-500 text-sm border-b">
+                        <th class="pb-3 font-medium">Usuario</th>
+                        <th class="pb-3 font-medium">Email</th>
+                        <th class="pb-3 font-medium">Rol</th>
+                        <th class="pb-3 font-medium">Institución</th>
+                        <th class="pb-3 font-medium">Estado</th>
+                        <th class="pb-3 font-medium">Último acceso</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% users.forEach(u => { %>
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-medium">
+                                    <%= u.name.charAt(0).toUpperCase() %>
+                                </div>
+                                <span class="font-medium text-gray-800"><%= u.name %></span>
+                            </div>
+                        </td>
+                        <td class="py-4 text-gray-600"><%= u.email %></td>
+                        <td class="py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium 
+                                <% if (u.role === 'ADMIN') { %>bg-purple-100 text-purple-700
+                                <% } else if (u.role === 'CURATOR') { %>bg-blue-100 text-blue-700
+                                <% } else { %>bg-green-100 text-green-700<% } %>">
+                                <%= u.role %>
+                            </span>
+                        </td>
+                        <td class="py-4 text-gray-600"><%= u.institution || '-' %></td>
+                        <td class="py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium <%= u.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+                                <%= u.isActive ? 'Activo' : 'Inactivo' %>
+                            </span>
+                        </td>
+                        <td class="py-4 text-gray-500 text-sm">
+                            <%= u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('es-EC') : 'Nunca' %>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <% } else { %>
+        <p class="text-gray-500 text-center py-8">No hay usuarios registrados</p>
+        <% } %>
+    </div>
+</div>

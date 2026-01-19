@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Espécimen - Herbario UTPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2d5a27',
+                        'primary-dark': '#1e3d1a',
+                        secondary: '#4a7c43',
+                        'light-green': '#e8f5e9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed top-0 left-0 w-64 h-screen bg-gradient-to-b from-primary to-secondary text-white z-50">
+            <div class="p-6 border-b border-white/10">
+                <h4 class="text-xl font-bold flex items-center gap-2">
+                    <i class="bi bi-flower1"></i> Herbario UTPL
+                </h4>
+                <p class="text-green-200 text-sm mt-1">Panel Administrativo</p>
+            </div>
+            <nav class="mt-4">
+                <ul class="space-y-1">
+                    <li><a href="/dashboard" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                    <li><a href="/plants" class="flex items-center gap-3 px-6 py-3 bg-white/15 text-white"><i class="bi bi-tree"></i> Especímenes</a></li>
+                    <li><a href="/dashboard/profile" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                </ul>
+                <div class="absolute bottom-0 left-0 right-0 border-t border-white/10">
+                    <a href="/logout" class="flex items-center gap-3 px-6 py-4 text-white/80 hover:bg-white/15"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</a>
+                </div>
+            </nav>
+        </aside>
+        <main class="ml-64 flex-1 p-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Total Especímenes -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-primary">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm font-medium">Total Especímenes</p>
+                <p class="text-3xl font-bold text-primary mt-1"><%= stats.total || 0 %></p>
+            </div>
+            <div class="bg-light-green p-3 rounded-full">
+                <i class="bi bi-tree text-2xl text-primary"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Familias -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm font-medium">Familias Registradas</p>
+                <p class="text-3xl font-bold text-green-600 mt-1"><%= stats.byFamily?.length || 0 %></p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-full">
+                <i class="bi bi-diagram-3 text-2xl text-green-600"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Países -->
+    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-emerald-500">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm font-medium">Países</p>
+                <p class="text-3xl font-bold text-emerald-600 mt-1"><%= stats.byCountry?.length || 0 %></p>
+            </div>
+            <div class="bg-emerald-100 p-3 rounded-full">
+                <i class="bi bi-globe-americas text-2xl text-emerald-600"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Top Familias -->
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                <i class="bi bi-bar-chart text-primary"></i>
+                Top 10 Familias
+            </h3>
+        </div>
+        <div class="p-6">
+            <% if (stats.byFamily && stats.byFamily.length > 0) { %>
+            <div class="space-y-3">
+                <% stats.byFamily.forEach((family, index) => { %>
+                <div class="flex items-center gap-3">
+                    <span class="w-6 h-6 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium">
+                        <%= index + 1 %>
+                    </span>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium text-gray-700"><%= family._id || 'Sin familia' %></span>
+                            <span class="text-sm text-gray-500"><%= family.count %></span>
+                        </div>
+                       
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <p class="text-gray-500 text-center py-8">No hay datos disponibles</p>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Por País -->
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                <i class="bi bi-geo-alt text-primary"></i>
+                Distribución por País
+            </h3>
+        </div>
+        <div class="p-6">
+            <% if (stats.byCountry && stats.byCountry.length > 0) { %>
+            <div class="space-y-3">
+                <% stats.byCountry.forEach(country => { %>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <i class="bi bi-flag text-secondary"></i>
+                        <span class="font-medium text-gray-700"><%= country._id || 'Sin país' %></span>
+                    </div>
+                    <span class="bg-primary text-white text-sm px-3 py-1 rounded-full font-medium">
+                        <%= country.count %>
+                    </span>
+                </div>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <p class="text-gray-500 text-center py-8">No hay datos disponibles</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="mt-8 bg-white rounded-xl shadow-sm p-6">
+    <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="bi bi-lightning text-primary"></i>
+        Acciones Rápidas
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="/plants/new" class="flex items-center gap-3 p-4 bg-light-green rounded-lg hover:bg-green-100 transition-all">
+            <div class="bg-primary p-2 rounded-lg">
+                <i class="bi bi-plus-lg text-white"></i>
+            </div>
+            <div>
+                <p class="font-medium text-gray-800">Nuevo Espécimen</p>
+                <p class="text-sm text-gray-500">Agregar registro</p>
+            </div>
+        </a>
+        <a href="/plants" class="flex items-center gap-3 p-4 bg-light-green rounded-lg hover:bg-green-100 transition-all">
+            <div class="bg-secondary p-2 rounded-lg">
+                <i class="bi bi-search text-white"></i>
+            </div>
+            <div>
+                <p class="font-medium text-gray-800">Buscar</p>
+                <p class="text-sm text-gray-500">Explorar colección</p>
+            </div>
+        </a>
+        <a href="/dashboard/profile" class="flex items-center gap-3 p-4 bg-light-green rounded-lg hover:bg-green-100 transition-all">
+            <div class="bg-green-600 p-2 rounded-lg">
+                <i class="bi bi-person text-white"></i>
+            </div>
+            <div>
+                <p class="font-medium text-gray-800">Mi Perfil</p>
+                <p class="text-sm text-gray-500">Ver información</p>
+            </div>
+        </a>
+    </div>
+</div>
+        </main>
+

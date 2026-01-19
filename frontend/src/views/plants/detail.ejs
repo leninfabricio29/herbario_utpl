@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Espécimen - Herbario UTPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2d5a27',
+                        'primary-dark': '#1e3d1a',
+                        secondary: '#4a7c43',
+                        'light-green': '#e8f5e9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed top-0 left-0 w-64 h-screen bg-gradient-to-b from-primary to-secondary text-white z-50">
+            <div class="p-6 border-b border-white/10">
+                <h4 class="text-xl font-bold flex items-center gap-2">
+                    <i class="bi bi-flower1"></i> Herbario UTPL
+                </h4>
+                <p class="text-green-200 text-sm mt-1">Panel Administrativo</p>
+            </div>
+            <nav class="mt-4">
+                <ul class="space-y-1">
+                    <li><a href="/dashboard" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                    <li><a href="/plants" class="flex items-center gap-3 px-6 py-3 bg-white/15 text-white"><i class="bi bi-tree"></i> Especímenes</a></li>
+                    <li><a href="/dashboard/profile" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                </ul>
+                <div class="absolute bottom-0 left-0 right-0 border-t border-white/10">
+                    <a href="/logout" class="flex items-center gap-3 px-6 py-4 text-white/80 hover:bg-white/15"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="ml-64 flex-1 p-8">
+            <div class="max-w-5xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <a href="/plants" class="text-gray-500 hover:text-primary transition-all flex items-center gap-2">
+                        <i class="bi bi-arrow-left"></i> Volver a la lista
+                    </a>
+                    <div class="flex gap-2">
+                        <a href="/plants/<%= plant._id %>/edit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all text-sm">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <form action="/plants/<%= plant._id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Seguro que deseas eliminar este espécimen?')">
+                            <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all text-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Información principal (2 columnas) -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <!-- Header con nombre -->
+                            <div class="bg-gradient-to-r from-primary to-secondary p-6">
+                                <p class="text-green-200 text-sm">Catálogo #<%= plant.catalogNumber %></p>
+                                <h1 class="text-2xl font-bold italic text-white mt-1"><%= plant.taxonomy?.scientificName || 'Sin nombre científico' %></h1>
+                                <p class="text-green-100 mt-1"><%= plant.taxonomy?.scientificNameAuthorship || '' %></p>
+                            </div>
+
+                            <div class="p-6">
+                                <!-- Grid de información -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Taxonomía -->
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                            <i class="bi bi-diagram-3 text-primary"></i> Taxonomía
+                                        </h3>
+                                        <dl class="space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Familia</dt>
+                                                <dd class="font-medium"><%= plant.taxonomy?.family || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Género</dt>
+                                                <dd class="font-medium italic"><%= plant.taxonomy?.genus || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Epíteto</dt>
+                                                <dd class="font-medium italic"><%= plant.taxonomy?.specificEpithet || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Rango</dt>
+                                                <dd class="font-medium"><%= plant.taxonomy?.taxonRank || 'species' %></dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+
+                                    <!-- Ubicación -->
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                            <i class="bi bi-geo-alt text-primary"></i> Ubicación
+                                        </h3>
+                                        <dl class="space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">País</dt>
+                                                <dd class="font-medium"><%= plant.country || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Provincia</dt>
+                                                <dd class="font-medium"><%= plant.stateProvince || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Localidad</dt>
+                                                <dd class="font-medium"><%= plant.locality || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Elevación</dt>
+                                                <dd class="font-medium"><%= plant.verbatimElevation || '-' %></dd>
+                                            </div>
+                                            <% if (plant.decimalLatitude && plant.decimalLongitude) { %>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Coordenadas</dt>
+                                                <dd class="font-medium font-mono text-xs">
+                                                    <%= plant.decimalLatitude %>, <%= plant.decimalLongitude %>
+                                                </dd>
+                                            </div>
+                                            <% } %>
+                                        </dl>
+                                    </div>
+
+                                    <!-- Recolección -->
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                            <i class="bi bi-person text-primary"></i> Recolección
+                                        </h3>
+                                        <dl class="space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Recolector</dt>
+                                                <dd class="font-medium"><%= plant.recordedBy || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Identificado por</dt>
+                                                <dd class="font-medium"><%= plant.identifiedBy || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Fecha</dt>
+                                                <dd class="font-medium"><%= plant.eventDate || '-' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Hábitat</dt>
+                                                <dd class="font-medium"><%= plant.habitat || '-' %></dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+
+                                    <!-- Metadatos -->
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                            <i class="bi bi-info-circle text-primary"></i> Registro
+                                        </h3>
+                                        <dl class="space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Institución</dt>
+                                                <dd class="font-medium"><%= plant.institutionCode || 'UTPL' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Colección</dt>
+                                                <dd class="font-medium"><%= plant.collectionCode || 'HUTPL' %></dd>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <dt class="text-gray-500">Creado</dt>
+                                                <dd class="font-medium"><%= new Date(plant.createdAt).toLocaleDateString('es-EC') %></dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                                <!-- Imágenes -->
+                                <% const backendUrl = process.env.API_BASE_URL || 'http://localhost:3000'; %>
+                                <% if (plant.images && plant.images.length > 0) { %>
+                                <div class="mt-6">
+                                    <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                        <i class="bi bi-images text-primary"></i> Imágenes (<%= plant.images.length %>)
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <% plant.images.forEach(img => { %>
+                                        <div class="relative group cursor-pointer" onclick="openImage(img.url || img.thumbnailUrl || img.base64 || img.thumbnailBase64)">
+                                            <% let src = img.url || img.thumbnailUrl || img.base64 || img.thumbnailBase64;
+                                               if (src && src.startsWith('/uploads/')) src = backendUrl + src; %>
+                                            <% if (src) { %>
+                                            <img src="<%= src %>"
+                                                 alt="<%= img.description || 'Imagen del espécimen' %>"
+                                                 class="w-full h-48 object-cover rounded-lg border shadow">
+                                            <% } else { %>
+                                            <div class="w-full h-48 flex items-center justify-center bg-gray-100 rounded-lg border">
+                                                <span class="text-gray-400 text-sm">Sin imagen disponible</span>
+                                            </div>
+                                            <% } %>
+                                            <% if (img.description) { %>
+                                            <p class="text-xs text-gray-500 mt-1 text-center"><%= img.description %></p>
+                                            <% } %>
+                                        </div>
+                                        <% }) %>
+                                    </div>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar con QR (1 columna) -->
+                    <div class="space-y-6">
+                        <!-- Código QR -->
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-qr-code text-primary"></i> Código QR
+                            </h3>
+                            <div class="text-center">
+                                <% if (plant.qrCodeDataUrl) { %>
+                                <div class="bg-white border-4 border-primary rounded-xl p-4 inline-block shadow-lg">
+                                    <img src="<%= plant.qrCodeDataUrl %>" alt="Código QR del espécimen" class="w-48 h-48 mx-auto">
+                                </div>
+                                <p class="text-sm text-gray-500 mt-4">
+                                    Escanea este código para ver la información pública del espécimen
+                                </p>
+                                <div class="mt-4 space-y-2">
+                                    <a href="<%= plant.qrCodeDataUrl %>" download="qr-<%= plant.catalogNumber %>.png"
+                                       class="block w-full px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg transition-all text-sm">
+                                        <i class="bi bi-download mr-1"></i> Descargar QR
+                                    </a>
+                                    <button onclick="printQR()" 
+                                            class="block w-full px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-white rounded-lg transition-all text-sm">
+                                        <i class="bi bi-printer mr-1"></i> Imprimir QR
+                                    </button>
+                                </div>
+                                <% } else { %>
+                                <div class="bg-gray-100 rounded-xl p-8">
+                                    <i class="bi bi-qr-code text-4xl text-gray-300"></i>
+                                    <p class="text-gray-400 mt-2 text-sm">QR no disponible</p>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Occurrence ID -->
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <h3 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="bi bi-key text-primary"></i> Identificador Único
+                            </h3>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <code class="text-xs text-gray-600 break-all"><%= plant.occurrenceID %></code>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">
+                                Este ID se usa para la consulta pública
+                            </p>
+                        </div>
+
+                        <!-- Enlace público -->
+                        
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para imágenes -->
+    <div id="imageModal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-4" onclick="closeImage()">
+        <img id="modalImage" src="" alt="Imagen ampliada" class="max-w-full max-h-full rounded-lg">
+        <button onclick="closeImage()" class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <script>
+        function openImage(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.remove('hidden');
+            document.getElementById('imageModal').classList.add('flex');
+        }
+
+        function closeImage() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('imageModal').classList.remove('flex');
+        }
+
+        function printQR() {
+            const qrImage = document.querySelector('img[alt="Código QR del espécimen"]');
+            if (qrImage) {
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>QR - <%= plant.catalogNumber %></title>
+                        <style>
+                            body { 
+                                display: flex; 
+                                flex-direction: column;
+                                align-items: center; 
+                                justify-content: center; 
+                                min-height: 100vh; 
+                                margin: 0;
+                                font-family: Arial, sans-serif;
+                            }
+                            img { width: 300px; height: 300px; }
+                            h2 { margin-top: 20px; font-style: italic; }
+                            p { color: #666; margin: 5px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${qrImage.src}" alt="QR Code">
+                        <h2><%= plant.taxonomy?.scientificName || 'Espécimen' %></h2>
+                        <p>Catálogo: <%= plant.catalogNumber %></p>
+                        <p>Herbario UTPL</p>
+                        <script>window.onload = function() { window.print(); }<\/script>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+            }
+        }
+
+        // Cerrar modal con Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeImage();
+        });
+    </script>
+</body>
+</html>

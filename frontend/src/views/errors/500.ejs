@@ -1,0 +1,12 @@
+<div class="min-h-[60vh] flex flex-col items-center justify-center text-center">
+    <i class="bi bi-bug text-8xl text-red-400 mb-6"></i>
+    <h1 class="text-4xl font-bold text-gray-800 mb-2">500</h1>
+    <p class="text-xl text-gray-500 mb-6">Error del servidor</p>
+    <p class="text-gray-400 mb-2">Algo salió mal. Por favor intenta más tarde.</p>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <p class="text-sm text-red-500 mb-8 font-mono"><%= error %></p>
+    <% } %>
+    <a href="/dashboard" class="px-6 py-3 bg-primary hover:bg-secondary text-white rounded-lg transition-all font-medium">
+        <i class="bi bi-house mr-2"></i>Ir al Dashboard
+    </a>
+</div>

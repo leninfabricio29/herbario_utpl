@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= isEdit ? 'Editar' : 'Nuevo' %> Espécimen - Herbario UTPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2d5a27',
+                        'primary-dark': '#1e3d1a',
+                        secondary: '#4a7c43',
+                        'light-green': '#e8f5e9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed top-0 left-0 w-64 h-screen bg-gradient-to-b from-primary to-secondary text-white z-50">
+            <div class="p-6 border-b border-white/10">
+                <h4 class="text-xl font-bold flex items-center gap-2">
+                    <i class="bi bi-flower1"></i> Herbario UTPL
+                </h4>
+                <p class="text-green-200 text-sm mt-1">Panel Administrativo</p>
+            </div>
+            <nav class="mt-4">
+                <ul class="space-y-1">
+                    <li><a href="/dashboard" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                    <li><a href="/plants" class="flex items-center gap-3 px-6 py-3 bg-white/15 text-white"><i class="bi bi-tree"></i> Especímenes</a></li>
+                    <li><a href="/dashboard/profile" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                </ul>
+                <div class="absolute bottom-0 left-0 right-0 border-t border-white/10">
+                    <a href="/logout" class="flex items-center gap-3 px-6 py-4 text-white/80 hover:bg-white/15"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main -->
+        <main class="ml-64 flex-1 p-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Breadcrumb -->
+                <div class="mb-6">
+                    <a href="/plants" class="text-gray-500 hover:text-primary transition-all flex items-center gap-2">
+                        <i class="bi bi-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-gradient-to-r from-primary to-secondary px-6 py-4">
+                        <h2 class="text-xl font-bold text-white">
+                            <i class="bi bi-<%= isEdit ? 'pencil' : 'plus-circle' %> mr-2"></i>
+                            <%= isEdit ? 'Editar Espécimen' : 'Nuevo Espécimen' %>
+                        </h2>
+                    </div>
+
+                    <form action="<%= isEdit ? '/plants/' + plant._id : '/plants' %>" method="POST" enctype="multipart/form-data" class="p-6">
+                        
+                        <!-- Identificación -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-tag text-primary"></i> Identificación
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de Catálogo *</label>
+                                    <input type="text" name="catalogNumber" required
+                                        value="<%= plant?.catalogNumber || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Recolector *</label>
+                                    <input type="text" name="recordedBy" required
+                                        value="<%= plant?.recordedBy || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Identificado por</label>
+                                    <input type="text" name="identifiedBy"
+                                        value="<%= plant?.identifiedBy || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha del Evento</label>
+                                    <input type="date" name="eventDate"
+                                        value="<%= plant?.eventDate ? plant.eventDate.split('T')[0] : '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Taxonomía -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-diagram-3 text-primary"></i> Taxonomía
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Familia *</label>
+                                    <input type="text" name="family" required
+                                        value="<%= plant?.taxonomy?.family || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Género *</label>
+                                    <input type="text" name="genus" required
+                                        value="<%= plant?.taxonomy?.genus || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Epíteto Específico</label>
+                                    <input type="text" name="specificEpithet"
+                                        value="<%= plant?.taxonomy?.specificEpithet || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Autoría</label>
+                                    <input type="text" name="scientificNameAuthorship"
+                                        value="<%= plant?.taxonomy?.scientificNameAuthorship || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Científico *</label>
+                                    <input type="text" name="scientificName" required
+                                        value="<%= plant?.taxonomy?.scientificName || '' %>"
+                                        placeholder="Género + epíteto específico"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none italic">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-geo-alt text-primary"></i> Ubicación
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">País</label>
+                                    <input type="text" name="country"
+                                        value="<%= plant?.country || 'Ecuador' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Provincia/Estado</label>
+                                    <input type="text" name="stateProvince"
+                                        value="<%= plant?.stateProvince || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Localidad *</label>
+                                    <input type="text" name="locality" required
+                                        value="<%= plant?.locality || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hábitat</label>
+                                    <input type="text" name="habitat"
+                                        value="<%= plant?.habitat || '' %>"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Elevación</label>
+                                    <input type="text" name="verbatimElevation"
+                                        value="<%= plant?.verbatimElevation || '' %>"
+                                        placeholder="ej: 2500 m"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Latitud</label>
+                                        <input type="number" step="any" name="decimalLatitude"
+                                            value="<%= plant?.decimalLatitude || '' %>"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Longitud</label>
+                                        <input type="number" step="any" name="decimalLongitude"
+                                            value="<%= plant?.decimalLongitude || '' %>"
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Imágenes -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="bi bi-images text-primary"></i> Imágenes
+                            </h3>
+                            <% const backendUrl = process.env.API_BASE_URL || 'http://localhost:3000'; %>
+                            <% if (isEdit && plant?.images && plant.images.length > 0) { %>
+                            <!-- Imágenes existentes -->
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-600 mb-2">Imágenes actuales:</p>
+                                <div class="grid grid-cols-3 md:grid-cols-5 gap-3">
+                                    <% plant.images.forEach(img => { %>
+                                    <% let src = img.url || img.thumbnailUrl || img.base64 || img.thumbnailBase64;
+                                       if (src && src.startsWith('/uploads/')) src = backendUrl + src; %>
+                                    <div class="relative group">
+                                        <% if (src) { %>
+                                        <img src="<%= src %>" 
+                                             alt="<%= img.description || 'Imagen' %>"
+                                             class="w-full h-20 object-cover rounded-lg border">
+                                        <% } else { %>
+                                        <div class="w-full h-20 flex items-center justify-center bg-gray-100 rounded-lg border">
+                                            <span class="text-gray-400 text-xs">Sin imagen</span>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                            <% } %>
+
+                            <!-- Subir nuevas imágenes -->
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-all">
+                                <input type="file" name="images" id="images" multiple accept="image/*" 
+                                       class="hidden" onchange="previewImages(this)">
+                                <label for="images" class="cursor-pointer">
+                                    <i class="bi bi-cloud-upload text-4xl text-gray-400"></i>
+                                    <p class="mt-2 text-sm text-gray-600">
+                                        <span class="text-primary font-medium">Haz clic para subir</span> o arrastra las imágenes
+                                    </p>
+                                    <p class="text-xs text-gray-400 mt-1">PNG, JPG, WebP hasta 10MB (máx. 5 archivos)</p>
+                                </label>
+                            </div>
+                            
+                            <!-- Preview -->
+                            <div id="imagePreview" class="mt-4 grid grid-cols-3 md:grid-cols-5 gap-3 hidden"></div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+                            <a href="/plants" class="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all text-gray-600">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-secondary text-white rounded-lg transition-all font-medium">
+                                <i class="bi bi-check-lg mr-1"></i>
+                                <%= isEdit ? 'Guardar Cambios' : 'Crear Espécimen' %>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function previewImages(input) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            if (input.files && input.files.length > 0) {
+                preview.classList.remove('hidden');
+                
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-20 object-cover rounded-lg border">
+                            <span class="absolute top-1 right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">${index + 1}</span>
+                        `;
+                        preview.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                preview.classList.add('hidden');
+            }
+        }
+    </script>
+
+    <% if (messages && messages.error && messages.error.length > 0) { %>
+    <div class="mb-4">
+        <% messages.error.forEach(function(msg) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-2" role="alert">
+            <span class="block sm:inline"><%= msg %></span>
+        </div>
+        <% }) %>
+    </div>
+    <% } %>
+    <% if (messages && messages.success && messages.success.length > 0) { %>
+    <div class="mb-4">
+        <% messages.success.forEach(function(msg) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-2" role="alert">
+            <span class="block sm:inline"><%= msg %></span>
+        </div>
+        <% }) %>
+    </div>
+    <% } %>
+</body>
+</html>

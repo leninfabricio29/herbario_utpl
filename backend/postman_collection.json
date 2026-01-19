@@ -1,0 +1,636 @@
+{
+	"info": {
+		"_postman_id": "utpl-herbario-api-collection",
+		"name": "UTPL Herbario API",
+		"description": "API REST para gestión de especímenes botánicos basado en Darwin Core.\n\n## Autenticación\nLa API usa JWT (JSON Web Tokens). Para acceder a rutas protegidas:\n1. Hacer login en `/api/auth/login`\n2. Copiar el token recibido\n3. Agregar header `Authorization: Bearer <token>`\n\n## Credenciales por defecto\n- **Email:** admin@utpl.edu.ec\n- **Password:** Admin123!\n\n## Roles\n- **ADMIN:** Acceso completo\n- **CURATOR:** Puede crear, editar y eliminar registros\n- **CATALOGER:** Solo puede crear registros",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "🔐 Auth",
+			"description": "Endpoints de autenticación y gestión de usuarios",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.collectionVariables.set('token', response.data.token);",
+									"        console.log('Token guardado exitosamente');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@utpl.edu.ec\",\n    \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Iniciar sesión y obtener token JWT.\n\n**Nota:** El token se guarda automáticamente en las variables de la colección."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "profile"]
+						},
+						"description": "Obtener perfil del usuario autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Administrador UTPL Actualizado\",\n    \"institution\": \"Universidad Técnica Particular de Loja - Ecuador\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "profile"]
+						},
+						"description": "Actualizar perfil propio"
+					},
+					"response": []
+				},
+				{
+					"name": "Register User (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Juan Pérez\",\n    \"email\": \"juan.perez@utpl.edu.ec\",\n    \"password\": \"Cataloger123!\",\n    \"role\": \"CATALOGER\",\n    \"institution\": \"Universidad Técnica Particular de Loja\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Registrar nuevo usuario (solo ADMIN)\n\nRoles disponibles:\n- ADMIN\n- CURATOR\n- CATALOGER"
+					},
+					"response": []
+				},
+				{
+					"name": "List Users (Admin Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/users?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "users"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "role",
+									"value": "CATALOGER",
+									"disabled": true
+								},
+								{
+									"key": "isActive",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Listar todos los usuarios (solo ADMIN)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Juan Pérez Actualizado\",\n    \"role\": \"CURATOR\",\n    \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/users/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "USER_ID_HERE"
+								}
+							]
+						},
+						"description": "Actualizar usuario (solo ADMIN)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/users/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "USER_ID_HERE"
+								}
+							]
+						},
+						"description": "Desactivar usuario (soft delete, solo ADMIN)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🌿 Plants (Private)",
+			"description": "Endpoints privados para gestión de registros de plantas",
+			"item": [
+				{
+					"name": "Create Plant Record",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"catalogNumber\": \"UTPL-001234\",\n    \"recordNumber\": \"JP-2024-001\",\n    \"recordedBy\": \"Juan Pérez\",\n    \"identifiedBy\": \"María García\",\n    \"catalogerName\": \"Admin UTPL\",\n    \"eventDate\": \"2024-06-15\",\n    \"country\": \"Ecuador\",\n    \"countryCode\": \"EC\",\n    \"stateProvince\": \"Loja\",\n    \"county\": \"Loja\",\n    \"locality\": \"Parque Nacional Podocarpus, sendero Cajanuma\",\n    \"habitat\": \"Bosque montano húmedo, 2800 m.s.n.m.\",\n    \"decimalLatitude\": -4.0833,\n    \"decimalLongitude\": -79.1667,\n    \"minimumElevationInMeters\": 2750,\n    \"maximumElevationInMeters\": 2850,\n    \"taxonomy\": {\n        \"kingdom\": \"Plantae\",\n        \"phylum\": \"Tracheophyta\",\n        \"class\": \"Magnoliopsida\",\n        \"order\": \"Ericales\",\n        \"family\": \"Ericaceae\",\n        \"genus\": \"Vaccinium\",\n        \"specificEpithet\": \"floribundum\",\n        \"scientificName\": \"Vaccinium floribundum Kunth\",\n        \"scientificNameAuthorship\": \"Kunth\",\n        \"taxonRank\": \"species\",\n        \"vernacularName\": \"Mortiño\"\n    },\n    \"institutionCode\": \"UTPL\",\n    \"collectionCode\": \"HUTPL\",\n    \"occurrenceRemarks\": \"Arbusto de 1.5m, frutos maduros de color morado oscuro. Asociado con páramo arbustivo.\",\n    \"reproductiveCondition\": \"Fructificando\",\n    \"preparations\": \"Ejemplar seco prensado\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/plants",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants"]
+						},
+						"description": "Crear nuevo registro de planta con generación automática de QR.\n\n**Campos requeridos:**\n- catalogNumber\n- recordedBy\n- locality\n- taxonomy.family\n- taxonomy.genus\n- taxonomy.scientificName"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Plants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "family",
+									"value": "Ericaceae",
+									"disabled": true
+								},
+								{
+									"key": "genus",
+									"value": "Vaccinium",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "Ecuador",
+									"disabled": true
+								},
+								{
+									"key": "stateProvince",
+									"value": "Loja",
+									"disabled": true
+								},
+								{
+									"key": "year",
+									"value": "2024",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Vaccinium",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt",
+									"disabled": true
+								},
+								{
+									"key": "sortOrder",
+									"value": "desc",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Listar todos los registros de plantas con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plant by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "PLANT_ID_HERE"
+								}
+							]
+						},
+						"description": "Obtener registro por ID de MongoDB"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Plant",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"identifiedBy\": \"Dr. Carlos López\",\n    \"taxonomy\": {\n        \"kingdom\": \"Plantae\",\n        \"family\": \"Ericaceae\",\n        \"genus\": \"Vaccinium\",\n        \"scientificName\": \"Vaccinium floribundum Kunth\",\n        \"taxonomicStatus\": \"accepted\"\n    },\n    \"occurrenceRemarks\": \"Espécimen revisado y confirmado por especialista.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "PLANT_ID_HERE"
+								}
+							]
+						},
+						"description": "Actualizar registro de planta (CURATOR, ADMIN)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Plant",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "PLANT_ID_HERE"
+								}
+							]
+						},
+						"description": "Eliminar registro (soft delete, CURATOR, ADMIN)"
+					},
+					"response": []
+				},
+				{
+					"name": "Regenerate QR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/:id/regenerate-qr",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", ":id", "regenerate-qr"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "PLANT_ID_HERE"
+								}
+							]
+						},
+						"description": "Regenerar código QR para un registro"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Collection Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", "stats"]
+						},
+						"description": "Obtener estadísticas de la colección"
+					},
+					"response": []
+				},
+				{
+					"name": "Advanced Search",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"page\": 1,\n    \"limit\": 20,\n    \"filters\": {\n        \"taxonomy\": {\n            \"family\": \"Ericaceae\",\n            \"genus\": \"Vaccinium\"\n        },\n        \"location\": {\n            \"country\": \"Ecuador\",\n            \"stateProvince\": \"Loja\"\n        }\n    },\n    \"dateRange\": {\n        \"startDate\": \"2020-01-01\",\n        \"endDate\": \"2024-12-31\"\n    },\n    \"coordinates\": {\n        \"minLat\": -5.0,\n        \"maxLat\": -3.0,\n        \"minLng\": -80.0,\n        \"maxLng\": -78.0\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/plants/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "plants", "search"]
+						},
+						"description": "Búsqueda avanzada con múltiples filtros"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🌍 Public (QR Access)",
+			"description": "Endpoints públicos para acceso sin autenticación (QR)",
+			"item": [
+				{
+					"name": "Get Plant by OccurrenceID (QR)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/plants/:occurrenceID",
+							"host": ["{{baseUrl}}"],
+							"path": ["public", "plants", ":occurrenceID"],
+							"variable": [
+								{
+									"key": "occurrenceID",
+									"value": "550e8400-e29b-41d4-a716-446655440000",
+									"description": "UUID del registro (escanear QR)"
+								}
+							]
+						},
+						"description": "**Endpoint principal para códigos QR**\n\nObtener información pública de un espécimen usando su occurrenceID (UUID).\n\nNo requiere autenticación."
+					},
+					"response": []
+				},
+				{
+					"name": "List Public Plants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/plants?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["public", "plants"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "family",
+									"value": "Ericaceae",
+									"disabled": true
+								},
+								{
+									"key": "genus",
+									"value": "Vaccinium",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "Ecuador",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Listar especímenes públicos para navegación"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Families",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/plants/families",
+							"host": ["{{baseUrl}}"],
+							"path": ["public", "plants", "families"]
+						},
+						"description": "Listar familias disponibles"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Countries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/plants/countries",
+							"host": ["{{baseUrl}}"],
+							"path": ["public", "plants", "countries"]
+						},
+						"description": "Listar países disponibles"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/public/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["public", "stats"]
+						},
+						"description": "Estadísticas públicas de la colección"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🏥 Health Check",
+			"description": "Verificación de estado del servidor",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						},
+						"description": "Verificar estado del servidor"
+					},
+					"response": []
+				},
+				{
+					"name": "API Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": ["{{baseUrl}}"],
+							"path": [""]
+						},
+						"description": "Información general de la API"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

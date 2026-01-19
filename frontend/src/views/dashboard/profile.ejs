@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Espécimen - Herbario UTPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2d5a27',
+                        'primary-dark': '#1e3d1a',
+                        secondary: '#4a7c43',
+                        'light-green': '#e8f5e9'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed top-0 left-0 w-64 h-screen bg-gradient-to-b from-primary to-secondary text-white z-50">
+            <div class="p-6 border-b border-white/10">
+                <h4 class="text-xl font-bold flex items-center gap-2">
+                    <i class="bi bi-flower1"></i> Herbario UTPL
+                </h4>
+                <p class="text-green-200 text-sm mt-1">Panel Administrativo</p>
+            </div>
+            <nav class="mt-4">
+                <ul class="space-y-1">
+                    <li><a href="/dashboard" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-grid-1x2"></i> Dashboard</a></li>
+                    <li><a href="/plants" class="flex items-center gap-3 px-6 py-3 bg-white/15 text-white"><i class="bi bi-tree"></i> Especímenes</a></li>
+                    <li><a href="/dashboard/profile" class="flex items-center gap-3 px-6 py-3 text-white/80 hover:bg-white/15"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                </ul>
+                <div class="absolute bottom-0 left-0 right-0 border-t border-white/10">
+                    <a href="/logout" class="flex items-center gap-3 px-6 py-4 text-white/80 hover:bg-white/15"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="ml-64 flex-1 p-8">
+            <div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-primary to-secondary px-6 py-8 text-center">
+            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-4xl font-bold text-primary">
+                    <%= user ? user.name.charAt(0).toUpperCase() : 'U' %>
+                </span>
+            </div>
+            <h2 class="text-2xl font-bold text-white"><%= user ? user.name : 'Usuario' %></h2>
+            <span class="inline-block mt-2 px-4 py-1 bg-white/20 rounded-full text-white text-sm">
+                <%= user ? user.role : 'ROL' %>
+            </span>
+        </div>
+
+        <!-- Info -->
+        <div class="p-6 space-y-4">
+            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <i class="bi bi-envelope text-primary text-xl"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Correo Electrónico</p>
+                    <p class="font-medium text-gray-800"><%= user ? user.email : '-' %></p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <i class="bi bi-building text-primary text-xl"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Institución</p>
+                    <p class="font-medium text-gray-800"><%= user && user.institution ? user.institution : 'UTPL' %></p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <i class="bi bi-shield-check text-primary text-xl"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Rol en el Sistema</p>
+                    <p class="font-medium text-gray-800">
+                        <% if (user && user.role === 'ADMIN') { %>
+                            Administrador - Acceso completo
+                        <% } else if (user && user.role === 'CURATOR') { %>
+                            Curador - Gestión de colección
+                        <% } else { %>
+                            Catalogador - Ingreso de datos
+                        <% } %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                <i class="bi bi-clock-history text-primary text-xl"></i>
+                <div>
+                    <p class="text-sm text-gray-500">Último Acceso</p>
+                    <p class="font-medium text-gray-800">
+                        <%= user && user.lastLogin ? new Date(user.lastLogin).toLocaleString('es-EC') : 'Sesión actual' %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </main>
+
